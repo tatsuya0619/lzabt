@@ -46,7 +46,7 @@ Options:
 The following command compresses `SConstruct`, and output to `hoge.lz` by the algorithm LZ-ABT.
 
 ```sh
-$ out/compress -f SConstruct -o hoge.lz -a lzabt
+$ out/compress -f SConstruct -o hoge.lz -a lzabt -p 0.2
 ```
 
 # Decompress
