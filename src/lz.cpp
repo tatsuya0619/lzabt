@@ -209,10 +209,9 @@ namespace LZFF{
 	STree::Node* lasts[2] = {stacked_factors[sp-2], stacked_factors[sp-1]};
 	std::string path_label;
 	if(checkRatio(lasts[0]->depth, lasts[1]->depth, coef_limit)){
-	  tree.toString(lasts[1], path_label); //toString takes long time...
+	  tree.toString(lasts[1], path_label);
 	  seq.push_back(std::make_pair(lasts[0]->fid, lasts[1]->fid));
 	  STree::Node *new_node = tree.insertFactorNode(lasts[0], path_label, 0, path_label.length());
-	  //tree.write(lasts[0]->fid, lasts[1]->fid);
 	  --sp;
 	  stacked_factors[sp-1] = new_node;
 	}else break;
@@ -254,12 +253,8 @@ namespace LZFF{
     using Node = STreeComp::Node;
     std::vector<Node*> stacked_factors;
     std::string remain_string;
-    unsigned int bp = 0;
     unsigned int limit = 1;
     bool unknown_chars[CHAR_SIZE];
-    unsigned int num_of_processed = 0;
-    bool is_limited = false;
-    unsigned int max_length = 10000000;
     for(unsigned int i = 0; i < CHAR_SIZE; ++i)
       unknown_chars[i] = true;
 
@@ -276,8 +271,8 @@ namespace LZFF{
       if(cur == tree.root) break;
       stacked_factors.push_back(cur);
       remain_string.erase(0, cur->depth);
-      num_of_processed += cur->depth;
-      while(stacked_factors.size() > 1 + bp){
+
+      while(stacked_factors.size() > 1){
 	Node* lasts[2] = {stacked_factors[stacked_factors.size()-2],
 			  stacked_factors[stacked_factors.size()-1]
 	};
@@ -293,15 +288,6 @@ namespace LZFF{
 	  stacked_factors.pop_back();
 	  stacked_factors[stacked_factors.size()-1] = new_node;
 	}else break;
-      }
-      if(!is_limited && num_of_processed > max_length){
-	is_limited = true;
-	max_length = max_length*20/tree.getNumFNodes();
-	for(; stacked_factors[bp]->depth > max_length && bp < stacked_factors.size(); ++bp);
-      }
-
-      if(is_limited && stacked_factors[bp]->depth > max_length){
-	++bp;
       }
 
       limit = stacked_factors[stacked_factors.size()-1]->depth * coef_limit+THRESHOLD; //the limit of next factor length
